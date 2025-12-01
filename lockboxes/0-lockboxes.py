@@ -2,7 +2,7 @@
 """
 Lockboxes – canUnlockAll
 
-This module implements a simple depth‑first search to determine whether all boxes
+This module implements an iterative depth‑first search to determine whether all boxes
 can be opened given that box 0 is initially unlocked.
 """
 
@@ -27,29 +27,23 @@ def canUnlockAll(boxes: list[list[int]]) -> bool:
     """
     n = len(boxes)
     visited = set()
+    stack = [0]          # start with the unlocked box 0
 
-    def dfs(i: int) -> None:
-        """Recursive depth‑first search from box i."""
+    while stack:
+        i = stack.pop()
         if i in visited:
-            return
+            continue
         visited.add(i)
-        for key in boxes[i]:
-            # Only consider keys that refer to a real box.
-            if 0 <= key < n:
-                dfs(key)
 
-    dfs(0)  # Box 0 is unlocked at the start.
+        for key in boxes[i]:
+            if 0 <= key < n and key not in visited:
+                stack.append(key)
 
     return len(visited) == n
 
 
-# If this file is executed directly, run a quick manual test.
+# Quick sanity check when run directly.
 if __name__ == "__main__":
-    boxes = [[1], [2], [3], [4], []]
-    print(canUnlockAll(boxes))  # Expected: True
-
-    boxes = [[1, 4, 6], [2], [0, 4, 1], [5, 6, 2], [3], [4, 1], [6]]
-    print(canUnlockAll(boxes))  # Expected: True
-
-    boxes = [[1, 4], [2], [0, 4, 1], [3], [], [4, 1], [5, 6]]
-    print(canUnlockAll(boxes))  # Expected: False
+    # Example that triggers the recursion error previously
+    boxes = [[j for j in range(1000)] for _ in range(1000)]
+    print(canUnlockAll(boxes))          # Expected: True
